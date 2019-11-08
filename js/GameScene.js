@@ -9,6 +9,9 @@ class GameScene extends Phaser.Scene {
   #bull_positionX = null;
   #config = {};
   #cursors = null;
+  #music = null;
+  #missed = null;
+  #ole = null;
   #runnerGroup = null;
   #score = 0;
   #scoreText = null;
@@ -27,9 +30,25 @@ class GameScene extends Phaser.Scene {
         'assets/runner.png',
         {frameWidth: 40, frameHeight: 40}
     );
+    this.load.audio('missed', [
+      'assets/missed.ogg',
+      'assets/missed.mp3',
+    ]);
+    this.load.audio('music', [
+      'assets/espana.ogg',
+      'assets/espana.mp3',
+    ]);
+    this.load.audio('ole', [
+      'assets/ole.ogg',
+      'assets/ole.mp3',
+    ]);
   }
 
   create() {
+    this.missed = this.sound.add('missed');
+    this.music = this.sound.add('music');
+    this.ole = this.sound.add('ole');
+
     this.background = this.add.tileSprite(this.config.width / 2, this.config.height / 2, this.config.width, this.config.height, 'bg');
 
     this.scoreText = this.add.text(16, 16, 'score: 0', {
@@ -77,6 +96,7 @@ class GameScene extends Phaser.Scene {
       switch (this.state) {
         case 'new':
           this.state = 'running';
+          this.music.play();
           Phaser.Actions.Call(this.runnerGroup.getChildren(), runner => {
             runner.anims.play('running', true);
           }, this);
@@ -97,6 +117,7 @@ class GameScene extends Phaser.Scene {
           break;
         case 'ended':
           this.start();
+          this.music.stop();
           this.scene.switch(SCENE_TITLE);
           break;
       }
@@ -112,6 +133,7 @@ class GameScene extends Phaser.Scene {
 
   gotRunner(bull, runner) {
     if (!runner.caught) {
+      this.ole.play();
       runner.anims.play('caught', true);
       this.score += 1;
       this.scoreText.setText('Score:' + this.score);
