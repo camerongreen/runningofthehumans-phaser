@@ -2,7 +2,7 @@ const BOUNDS = 105;
 const BULL_POSITIONX_SPEED = 20;
 const RUNNERS_NUM = 5;
 const SPEED_INCREMENT = 0.1;
-const SPEED_MAX = 25;
+const SPEED_MAX = 20;
 
 class GameScene extends Phaser.Scene {
   #bull = null;
@@ -65,7 +65,7 @@ class GameScene extends Phaser.Scene {
 
     this.runnerGroup = this.physics.add.group({
       key: 'runner',
-      repeat: RUNNERS_NUM,
+      repeat: RUNNERS_NUM - 1,
     });
 
     this.physics.add.overlap(this.bull, this.runnerGroup.getChildren(), this.gotRunner, null, this);
@@ -73,7 +73,7 @@ class GameScene extends Phaser.Scene {
     this.cursors = this.input.keyboard.createCursorKeys();
 
     let space = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-    space.on('down',  () => {
+    space.on('up',  () => {
       switch (this.state) {
         case 'new':
           this.state = 'running';
@@ -111,7 +111,7 @@ class GameScene extends Phaser.Scene {
   }
 
   gotRunner(bull, runner) {
-    if (!runner.hasOwnProperty('caught')) {
+    if (!runner.caught) {
       runner.anims.play('caught', true);
       this.score += 1;
       this.scoreText.setText('Score:' + this.score);
@@ -157,16 +157,16 @@ class GameScene extends Phaser.Scene {
     this.speed = 0;
     this.bull_positionX = config.width / 2;
     this.bull.setVelocityX(0);
+    this.scoreText.setText('Score:' + this.score);
 
     Phaser.Actions.Call(this.runnerGroup.getChildren(), runner => {
       let runner_position_x = Phaser.Math.Between(BOUNDS, this.config.width - (2 * BOUNDS));
       let runner_position_y = Phaser.Math.Between(this.config.height - 200, this.config.height - 250);
       runner.setPosition(runner_position_x, runner_position_y);
-      runner.speed = Phaser.Math.Between(2, 15)
+      runner.speed = Phaser.Math.Between(2, SPEED_MAX - 5)
+      runner.anims.play('standing', true);
+      runner.caught = false;
     }, this);
-
   }
-
-
 
 }
