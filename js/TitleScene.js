@@ -40,11 +40,9 @@ class TitleScene extends Phaser.Scene {
     }).setOrigin(0.5);
 
     this.space = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+    this.space.on('up', () => {
+      this.scene.switch(SCENE_GAME);
+    });
   }
 
-  update() {
-    if (this.space.isDown) {
-      this.scene.switch(SCENE_GAME);
-    }
-  }
 }

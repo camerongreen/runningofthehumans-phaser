@@ -12,7 +12,6 @@ class GameScene extends Phaser.Scene {
   #runnerGroup = null;
   #score = 0;
   #scoreText = null;
-  #space = null;
   #speed = 0;
   #state = null;
 
@@ -31,9 +30,6 @@ class GameScene extends Phaser.Scene {
   }
 
   create() {
-    this.cursors = this.input.keyboard.createCursorKeys();
-    this.space = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-
     this.background = this.add.tileSprite(this.config.width / 2, this.config.height / 2, this.config.width, this.config.height, 'bg');
 
     this.scoreText = this.add.text(16, 16, 'score: 0', {
@@ -72,14 +68,39 @@ class GameScene extends Phaser.Scene {
       repeat: RUNNERS_NUM,
     });
 
-    Phaser.Actions.Call(this.runnerGroup.getChildren(), runner => {
-      let runner_position_x = Phaser.Math.Between(BOUNDS, this.config.width - (2 * BOUNDS));
-      let runner_position_y = Phaser.Math.Between(this.config.height - 200, this.config.height - 250);
-      runner.setPosition(runner_position_x, runner_position_y);
-      runner.speed = Phaser.Math.Between(2, 15)
-    }, this);
-
     this.physics.add.overlap(this.bull, this.runnerGroup.getChildren(), this.gotRunner, null, this);
+
+    this.cursors = this.input.keyboard.createCursorKeys();
+
+    let space = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+    space.on('down',  () => {
+      switch (this.state) {
+        case 'new':
+          this.state = 'running';
+          Phaser.Actions.Call(this.runnerGroup.getChildren(), runner => {
+            runner.anims.play('running', true);
+          }, this);
+          break;
+        case 'running':
+          this.scene.pause(this.key);
+          this.state = 'pause';
+          Phaser.Actions.Call(this.runnerGroup.getChildren(), runner => {
+            runner.anims.play('standing', true);
+          }, this);
+          break;
+        case 'pause':
+          this.scene.resume(this.key);
+          this.state = 'running';
+          Phaser.Actions.Call(this.runnerGroup.getChildren(), runner => {
+            runner.anims.play('running', true);
+          }, this);
+          break;
+        case 'ended':
+          this.start();
+          this.scene.switch(SCENE_TITLE);
+          break;
+      }
+    });
 
     this.start();
   }
@@ -106,10 +127,6 @@ class GameScene extends Phaser.Scene {
   }
 
   update() {
-    if (this.space.isDown) {
-      this.handleSpace();
-    }
-
     if (this.state === 'running') {
       if (this.cursors.up.isDown) {
         this.speed = Math.min(this.speed + SPEED_INCREMENT, SPEED_MAX);
@@ -140,35 +157,16 @@ class GameScene extends Phaser.Scene {
     this.speed = 0;
     this.bull_positionX = config.width / 2;
     this.bull.setVelocityX(0);
+
+    Phaser.Actions.Call(this.runnerGroup.getChildren(), runner => {
+      let runner_position_x = Phaser.Math.Between(BOUNDS, this.config.width - (2 * BOUNDS));
+      let runner_position_y = Phaser.Math.Between(this.config.height - 200, this.config.height - 250);
+      runner.setPosition(runner_position_x, runner_position_y);
+      runner.speed = Phaser.Math.Between(2, 15)
+    }, this);
+
   }
 
-  handleSpace() {
-    switch (this.state) {
-      case 'new':
-        this.state = 'running';
-        Phaser.Actions.Call(this.runnerGroup.getChildren(), runner => {
-          runner.anims.play('running', true);
-        }, this);
-        break;
-      case 'running':
-        this.scene.pause(SCENE_GAME);
-        this.state = 'pause';
-        Phaser.Actions.Call(this.runnerGroup.getChildren(), runner => {
-          runner.anims.play('standing', true);
-        }, this);
-        break;
-      case 'pause':
-        this.scene.resume(SCENE_GAME);
-        this.state = 'running';
-        Phaser.Actions.Call(this.runnerGroup.getChildren(), runner => {
-          runner.anims.play('running', true);
-        }, this);
-        break;
-      case 'ended':
-        this.start();
-        this.scene.switch(SCENE_TITLE);
-        break;
-    }
-  }
+
 
 }
