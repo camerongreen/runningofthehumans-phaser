@@ -3,7 +3,7 @@ class TitleScene extends Phaser.Scene {
   #space = null;
 
   constructor(name, config) {
-    super({key: name});
+    super(name);
     this.config = config;
   }
 
@@ -27,8 +27,8 @@ class TitleScene extends Phaser.Scene {
 
     const text = `
     Use your cursor keys to
-    help the bull run over drunken
-    tourists in Pamplona. 
+    help the bull run over drunk
+    tourists in Pamplona, Spain. 
     
     Press [space] to start and pause.
     `;

@@ -19,7 +19,7 @@ class GameScene extends Phaser.Scene {
   #state = null;
 
   constructor(name, config) {
-    super({key: name});
+    super(name);
     this.config = config;
   }
 
@@ -65,7 +65,7 @@ class GameScene extends Phaser.Scene {
 
     this.anims.create({
       key: 'running',
-      frames: this.anims.generateFrameNumbers('runner', {tart: 0, end: 5}),
+      frames: this.anims.generateFrameNumbers('runner', {start: 0, end: 5}),
       frameRate: 10,
       repeat: -1
     });
@@ -103,17 +103,13 @@ class GameScene extends Phaser.Scene {
           break;
         case 'running':
           this.scene.pause(this.key);
+          this.anims.pauseAll();
           this.state = 'pause';
-          Phaser.Actions.Call(this.runnerGroup.getChildren(), runner => {
-            runner.anims.play('standing', true);
-          }, this);
           break;
         case 'pause':
+          this.anims.resumeAll();
           this.scene.resume(this.key);
           this.state = 'running';
-          Phaser.Actions.Call(this.runnerGroup.getChildren(), runner => {
-            runner.anims.play('running', true);
-          }, this);
           break;
         case 'ended':
           this.start();
@@ -185,7 +181,7 @@ class GameScene extends Phaser.Scene {
       let runner_position_x = Phaser.Math.Between(BOUNDS, this.config.width - (2 * BOUNDS));
       let runner_position_y = Phaser.Math.Between(this.config.height - 200, this.config.height - 250);
       runner.setPosition(runner_position_x, runner_position_y);
-      runner.speed = Phaser.Math.Between(2, SPEED_MAX - 5)
+      runner.speed = Phaser.Math.Between(2, SPEED_MAX - 5);
       runner.anims.play('standing', true);
       runner.caught = false;
     }, this);
