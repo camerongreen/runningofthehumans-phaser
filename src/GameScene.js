@@ -147,7 +147,7 @@ class GameScene extends Phaser.Scene {
       // Game over.
       if (this.score === RUNNERS_NUM) {
         this.state = 'ended';
-        this.music.stop();
+        // this.music.stop();
         this.bull.setVelocityX(0);
       }
     }
