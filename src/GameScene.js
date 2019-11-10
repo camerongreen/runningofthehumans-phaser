@@ -102,24 +102,32 @@ class GameScene extends Phaser.Scene {
           }, this);
           break;
         case 'running':
-          this.scene.pause(this.key);
-          this.anims.pauseAll();
           this.state = 'pause';
+          this.pause();
           break;
         case 'pause':
-          this.anims.resumeAll();
-          this.scene.resume(this.key);
           this.state = 'running';
+          this.resume();
           break;
         case 'ended':
           this.start();
-          this.music.stop();
           this.scene.switch(SCENE_TITLE);
           break;
       }
     });
 
     this.start();
+  }
+
+  pause() {
+    this.anims.pauseAll();
+    this.music.pause();
+    this.bull.setVelocityX(0);
+  }
+
+  resume() {
+    this.anims.resumeAll();
+    this.music.resume();
   }
 
   hitWorldBounds(body) {
@@ -139,6 +147,7 @@ class GameScene extends Phaser.Scene {
       // Game over.
       if (this.score === RUNNERS_NUM) {
         this.state = 'ended';
+        this.music.stop();
         this.bull.setVelocityX(0);
       }
     }
