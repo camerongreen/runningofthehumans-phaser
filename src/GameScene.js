@@ -63,6 +63,14 @@ class GameScene extends Phaser.Scene {
       fill: '#000'
     });
 
+    this.resultsText = this.add.text(this.config.width / 2, this.config.height / 2, ``, {
+      font: 'bold 28px Arial',
+      fill: '#fff',
+      align: "center",
+    }).setOrigin(0.5);
+
+    this.resultsText.setShadow(3, 4, 'rgba(0,0,0,0.5', 5);
+
     this.physics.world.setBounds(BOUNDS, 0, this.config.width - (2 * BOUNDS), this.config.height);
 
     this.bull = this.physics.add.sprite(this.config.width / 2, this.config.height - 78, 'bull');
@@ -149,12 +157,7 @@ class GameScene extends Phaser.Scene {
       runner.caught = true;
       runner.speed = 0;
 
-      // Game over.
-      if (this.score === RUNNERS_NUM) {
-        this.state = 'ended';
-        // this.music.stop();
-        this.bull.setVelocityX(0);
-      }
+      this.checkFinish();
     }
   }
 
@@ -167,11 +170,16 @@ class GameScene extends Phaser.Scene {
       runner.caught = true;
       runner.speed = 0;
 
-      // Game over.
-      if (this.score === RUNNERS_NUM) {
-        this.state = 'ended';
-        this.bull.setVelocityX(0);
-      }
+      this.checkFinish();
+    }
+  }
+
+  checkFinish() {
+    // Game over.
+    if (this.score === RUNNERS_NUM) {
+      this.state = 'ended';
+      this.bull.setVelocityX(0);
+      this.showResult();
     }
   }
 
@@ -206,6 +214,18 @@ class GameScene extends Phaser.Scene {
     this.lastTime = Date.now();
   }
 
+  showResult() {
+    let seconds = this.timer / 1000;
+    let text = `
+    Score: ${(seconds + (this.missedScore * 5)).toFixed(1)}
+    =
+    Time: ${seconds.toFixed(1)}
+    +
+    Missed runners: ${this.missedScore} * 5 secs
+    `;
+    this.resultsText.setText(text);
+  }
+
   updateScore() {
     this.scoreText.setText(`Runners: ${this.score}/${RUNNERS_NUM}`);
   }
@@ -227,6 +247,8 @@ class GameScene extends Phaser.Scene {
     this.bull.setVelocityX(0);
     this.updateScore();
     this.updateTimer(0);
+
+    this.resultsText.setText('');
 
     Phaser.Actions.Call(this.runnerGroup.getChildren(), runner => {
       let runner_position_x = Phaser.Math.Between(BOUNDS, this.config.width - (2 * BOUNDS));
