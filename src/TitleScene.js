@@ -33,11 +33,13 @@ class TitleScene extends Phaser.Scene {
     Press [space] to start and pause.
     `;
 
-    this.add.text(this.config.width / 2, this.config.height / 2, text, {
+    let instructions = this.add.text(this.config.width / 2, this.config.height / 2, text, {
       font: 'bold 28px Arial',
       fill: '#fff',
       align: "center",
     }).setOrigin(0.5);
+
+    instructions.setShadow(3, 4, 'rgba(0,0,0,0.5', 5);
 
     this.space = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
     this.space.on('up', () => {
