@@ -1,28 +1,32 @@
-const BOUNDS = 105;
-const BULL_POSITIONX_SPEED = 20;
-const RUNNERS_NUM = 5;
-const SPEED_INCREMENT = 0.1;
-const SPEED_MAX = 20;
 
 class GameScene extends Phaser.Scene {
+  #background = null;
+  #bounds = 105;
   #bull = null;
-  #bull_positionX = null;
+  #bullPositionX = 0;
+  #bullPositionXSpeed = 20;
   #config = {};
   #cursors = null;
   #missed = null;
+  #lastTime = null;
   #missedScore = 0;
   #music = null;
   #ole = null;
   #runnerGroup = null;
+  #runnersNum = 5;
+  #resultsText = null;
   #score = 0;
   #scoreText = null;
   #speed = 0;
+  #speedIncrement = 0.1;
+  #speedMax = 20;
   #state = null;
   #timer = 0;
+  #timerText = 0;
 
   constructor(name, config) {
     super(name);
-    this.config = config;
+    this.#config = config;
   }
 
   preload() {
@@ -47,36 +51,36 @@ class GameScene extends Phaser.Scene {
   }
 
   create() {
-    this.missed = this.sound.add('missed', {volume: 0.1});
-    this.music = this.sound.add('music');
-    this.ole = this.sound.add('ole', {volume: 0.1});
+    this.#missed = this.sound.add('missed', {volume: 0.1});
+    this.#music = this.sound.add('music');
+    this.#ole = this.sound.add('ole', {volume: 0.1});
 
-    this.background = this.add.tileSprite(this.config.width / 2, this.config.height / 2, this.config.width, this.config.height, 'bg');
+    this.#background = this.add.tileSprite(this.#config.width / 2, this.#config.height / 2, this.#config.width, this.#config.height, 'bg');
 
-    this.scoreText = this.add.text(16, 16, ``, {
+    this.#scoreText = this.add.text(16, 16, ``, {
       fontSize: '32px',
       fill: '#000'
     });
 
-    this.timerText = this.add.text(this.config.width - 210, 16, ``, {
+    this.#timerText = this.add.text(this.#config.width - 210, 16, ``, {
       fontSize: '32px',
       fill: '#000'
     });
 
-    this.resultsText = this.add.text(this.config.width / 2, this.config.height / 2, ``, {
+    this.#resultsText = this.add.text(this.#config.width / 2, this.#config.height / 2, ``, {
       font: 'bold 28px Arial',
       fill: '#fff',
       align: "center",
     }).setOrigin(0.5);
 
-    this.resultsText.setShadow(3, 4, 'rgba(0,0,0,0.5', 5);
+    this.#resultsText.setShadow(3, 4, 'rgba(0,0,0,0.5', 5);
 
-    this.physics.world.setBounds(BOUNDS, 0, this.config.width - (2 * BOUNDS), this.config.height);
+    this.physics.world.setBounds(this.#bounds, 0, this.#config.width - (2 * this.#bounds), this.#config.height);
 
-    this.bull = this.physics.add.sprite(this.config.width / 2, this.config.height - 78, 'bull');
-    this.bull.setCollideWorldBounds(true);
-    this.bull.body.onWorldBounds = true;
-    this.physics.world.on('worldbounds', this.hitWorldBounds);
+    this.#bull = this.physics.add.sprite(this.#config.width / 2, this.#config.height - 78, 'bull');
+    this.#bull.setCollideWorldBounds(true);
+    this.#bull.body.onWorldBounds = true;
+    this.physics.world.on('worldbounds', () => {this.hitWorldBounds});
 
     this.anims.create({
       key: 'running',
@@ -97,35 +101,35 @@ class GameScene extends Phaser.Scene {
       frameRate: 20
     });
 
-    this.runnerGroup = this.physics.add.group({
+    this.#runnerGroup = this.physics.add.group({
       key: 'runner',
-      repeat: RUNNERS_NUM - 1,
+      repeat: this.#runnersNum - 1,
     });
 
-    this.physics.add.overlap(this.bull, this.runnerGroup.getChildren(), this.gotRunner, null, this);
+    this.physics.add.overlap(this.#bull, this.#runnerGroup.getChildren(), (bull, runner) => {this.gotRunner(bull, runner)}, null, this);
 
-    this.cursors = this.input.keyboard.createCursorKeys();
+    this.#cursors = this.input.keyboard.createCursorKeys();
 
     let space = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
     space.on('up', () => {
-      switch (this.state) {
+      switch (this.#state) {
         case 'running':
-          this.state = 'pause';
+          this.#state = 'pause';
           this.pause();
           break;
         case 'pause':
-          this.state = 'running';
+          this.#state = 'running';
           this.resume();
           break;
         case 'ended':
-          this.music.stop();
+          this.#music.stop();
           this.scene.switch(SCENE_TITLE);
           break;
         default:
           this.start();
-          this.state = 'running';
-          this.music.play();
-          Phaser.Actions.Call(this.runnerGroup.getChildren(), runner => {
+          this.#state = 'running';
+          this.#music.play();
+          Phaser.Actions.Call(this.#runnerGroup.getChildren(), runner => {
             runner.anims.play('running', true);
           }, this);
       }
@@ -134,25 +138,25 @@ class GameScene extends Phaser.Scene {
 
   pause() {
     this.anims.pauseAll();
-    this.music.pause();
-    this.bull.setVelocityX(0);
+    this.#music.pause();
+    this.#bull.setVelocityX(0);
   }
 
   resume() {
     this.anims.resumeAll();
-    this.music.resume();
+    this.#music.resume();
   }
 
   hitWorldBounds(body) {
-    this.bull_positionX = 0;
+    this.#bullPositionX = 0;
     body.setVelocityX(0);
   }
 
   gotRunner(bull, runner) {
     if (!runner.caught) {
-      this.ole.play();
+      this.#ole.play();
       runner.anims.play('caught', true);
-      this.score += 1;
+      this.#score += 1;
       this.updateScore();
       runner.caught = true;
       runner.speed = 0;
@@ -163,9 +167,9 @@ class GameScene extends Phaser.Scene {
 
   missedRunner(runner) {
     if (!runner.caught) {
-      this.missed.play();
-      this.score += 1;
-      this.missedScore += 1;
+      this.#missed.play();
+      this.#score += 1;
+      this.#missedScore += 1;
       this.updateScore();
       runner.caught = true;
       runner.speed = 0;
@@ -176,85 +180,85 @@ class GameScene extends Phaser.Scene {
 
   checkFinish() {
     // Game over.
-    if (this.score === RUNNERS_NUM) {
-      this.state = 'ended';
-      this.bull.setVelocityX(0);
+    if (this.#score === this.#runnersNum) {
+      this.#state = 'ended';
+      this.#bull.setVelocityX(0);
       this.showResult();
     }
   }
 
   update(time) {
-    if (this.state === 'running') {
-      this.timer += Date.now() - this.lastTime;
+    if (this.#state === 'running') {
+      this.#timer += Date.now() - this.#lastTime;
       this.updateTimer();
-      if (this.cursors.up.isDown) {
-        this.speed = Math.min(this.speed + SPEED_INCREMENT, SPEED_MAX);
+      if (this.#cursors.up.isDown) {
+        this.#speed = Math.min(this.#speed + this.#speedIncrement, this.#speedMax);
       }
-      else if (this.cursors.down.isDown) {
-        this.speed = Math.max(0, this.speed - SPEED_INCREMENT);
+      else if (this.#cursors.down.isDown) {
+        this.#speed = Math.max(0, this.#speed - this.#speedIncrement);
       }
-      else if (this.cursors.right.isDown) {
-        this.bull_positionX += BULL_POSITIONX_SPEED;
-        this.bull.setVelocityX(this.bull_positionX);
+      else if (this.#cursors.right.isDown) {
+        this.#bullPositionX += this.#bullPositionXSpeed;
+        this.#bull.setVelocityX(this.#bullPositionX);
       }
-      else if (this.cursors.left.isDown) {
-        this.bull_positionX -= BULL_POSITIONX_SPEED;
-        this.bull.setVelocityX(this.bull_positionX);
+      else if (this.#cursors.left.isDown) {
+        this.#bullPositionX -= this.#bullPositionXSpeed;
+        this.#bull.setVelocityX(this.#bullPositionX);
       }
 
-      this.background.tilePositionY -= this.speed;
+      this.#background.tilePositionY -= this.#speed;
 
-      Phaser.Actions.Call(this.runnerGroup.getChildren(), runner => {
-        runner.y += this.speed - runner.speed;
-        if (runner.y > this.config.height + 10) {
+      Phaser.Actions.Call(this.#runnerGroup.getChildren(), runner => {
+        runner.y += this.#speed - runner.speed;
+        if (runner.y > this.#config.height + 10) {
           this.missedRunner(runner);
         }
       }, this);
     }
-    this.lastTime = Date.now();
+    this.#lastTime = Date.now();
   }
 
   showResult() {
-    let seconds = this.timer / 1000;
+    let seconds = this.#timer / 1000;
     let text = `
-    Score: ${(seconds + (this.missedScore * 5)).toFixed(1)}
+    Score: ${(seconds + (this.#missedScore * 5)).toFixed(1)}
     =
     Time: ${seconds.toFixed(1)}
     +
-    Missed runners: ${this.missedScore} * 5 secs
+    Missed runners: ${this.#missedScore} * 5 secs
     `;
-    this.resultsText.setText(text);
+    this.#resultsText.setText(text);
   }
 
   updateScore() {
-    this.scoreText.setText(`Runners: ${this.score}/${RUNNERS_NUM}`);
+    this.#scoreText.setText(`Runners: ${this.#score}/${this.#runnersNum}`);
   }
 
   updateTimer() {
-    let seconds = this.timer / 1000;
-    this.timerText.setText(`Time: ${seconds.toFixed(1).padStart(4, " ")}`);
+    let seconds = this.#timer / 1000;
+    this.#timerText.setText(`Time: ${seconds.toFixed(1).padStart(4, " ")}`);
   }
 
   start() {
-    this.state = 'new';
-    this.score = 0;
-    this.missedScore = 0;
-    this.speed = 0;
-    this.bull_positionX = config.width / 2;
-    this.lastTime = Date.now();
-    this.timer = 0;
+    this.#state = 'new';
+    this.#score = 0;
+    this.#missedScore = 0;
+    this.#speed = 0;
+    this.#bullPositionX = config.width / 2;
+    this.#lastTime = Date.now();
+    this.#timer = 0;
 
-    this.bull.setVelocityX(0);
+    this.#bull.setVelocityX(0);
     this.updateScore();
     this.updateTimer(0);
 
-    this.resultsText.setText('');
+    this.#resultsText.setText('');
 
-    Phaser.Actions.Call(this.runnerGroup.getChildren(), runner => {
-      let runner_position_x = Phaser.Math.Between(BOUNDS, this.config.width - (2 * BOUNDS));
-      let runner_position_y = Phaser.Math.Between(this.config.height - 200, this.config.height - 250);
+    Phaser.Actions.Call(this.#runnerGroup.getChildren(), runner => {
+      let runner_position_x = Phaser.Math.Between(this.#bounds, this.#config.width - (2 * this.#bounds));
+      let runner_position_y = Phaser.Math.Between(this.#config.height - 200, this.#config.height - 250);
       runner.setPosition(runner_position_x, runner_position_y);
-      runner.speed = Phaser.Math.Between(2, SPEED_MAX - 5);
+      runner.speed = Phaser.Math.Between(2, this.#speedMax - 5);
       runner.anims.play('standing', true);
       runner.caught = false;
     }, this);
