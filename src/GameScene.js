@@ -1,5 +1,8 @@
-
 class GameScene extends Phaser.Scene {
+  // Public
+  state = 'new';
+
+  //private
   #background = null;
   #bounds = 105;
   #bull = null;
@@ -20,7 +23,6 @@ class GameScene extends Phaser.Scene {
   #speed = 0;
   #speedIncrement = 0.1;
   #speedMax = 20;
-  #state = null;
   #timer = 0;
   #timerText = 0;
 
@@ -80,7 +82,9 @@ class GameScene extends Phaser.Scene {
     this.#bull = this.physics.add.sprite(this.#config.width / 2, this.#config.height - 78, 'bull');
     this.#bull.setCollideWorldBounds(true);
     this.#bull.body.onWorldBounds = true;
-    this.physics.world.on('worldbounds', () => {this.hitWorldBounds});
+    this.physics.world.on('worldbounds', () => {
+      this.hitWorldBounds
+    });
 
     this.anims.create({
       key: 'running',
@@ -106,28 +110,29 @@ class GameScene extends Phaser.Scene {
       repeat: this.#runnersNum - 1,
     });
 
-    this.physics.add.overlap(this.#bull, this.#runnerGroup.getChildren(), (bull, runner) => {this.gotRunner(bull, runner)}, null, this);
+    this.physics.add.overlap(this.#bull, this.#runnerGroup.getChildren(), (bull, runner) => {
+      this.gotRunner(bull, runner)
+    }, null, this);
 
     this.#cursors = this.input.keyboard.createCursorKeys();
 
     let space = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
     space.on('up', () => {
-      switch (this.#state) {
+      switch (this.state) {
         case 'running':
-          this.#state = 'pause';
+          this.state = 'pause';
           this.pause();
           break;
         case 'pause':
-          this.#state = 'running';
+          this.state = 'running';
           this.resume();
           break;
         case 'ended':
           this.#music.stop();
           this.scene.switch(SCENE_TITLE);
           break;
-        default:
-          this.start();
-          this.#state = 'running';
+        case 'ready':
+          this.state = 'running';
           this.#music.play();
           Phaser.Actions.Call(this.#runnerGroup.getChildren(), runner => {
             runner.anims.play('running', true);
@@ -181,14 +186,19 @@ class GameScene extends Phaser.Scene {
   checkFinish() {
     // Game over.
     if (this.#score === this.#runnersNum) {
-      this.#state = 'ended';
+      this.state = 'ended';
       this.#bull.setVelocityX(0);
       this.showResult();
     }
   }
 
   update(time) {
-    if (this.#state === 'running') {
+    if (this.state === 'new') {
+      this.reset();
+      this.state = 'ready';
+    }
+
+    if (this.state === 'running') {
       this.#timer += Date.now() - this.#lastTime;
       this.updateTimer();
       if (this.#cursors.up.isDown) {
@@ -239,21 +249,23 @@ class GameScene extends Phaser.Scene {
     this.#timerText.setText(`Time: ${seconds.toFixed(1).padStart(4, " ")}`);
   }
 
-  start() {
-    this.#state = 'new';
+  clear() {
     this.#score = 0;
     this.#missedScore = 0;
     this.#speed = 0;
     this.#bullPositionX = config.width / 2;
     this.#lastTime = Date.now();
     this.#timer = 0;
-
     this.#bull.setVelocityX(0);
     this.updateScore();
     this.updateTimer(0);
-
+    this.#music.stop();
     this.#resultsText.setText('');
 
+  }
+
+  reset() {
+    this.clear();
     Phaser.Actions.Call(this.#runnerGroup.getChildren(), runner => {
       let runner_position_x = Phaser.Math.Between(this.#bounds, this.#config.width - (2 * this.#bounds));
       let runner_position_y = Phaser.Math.Between(this.#config.height - 200, this.#config.height - 250);

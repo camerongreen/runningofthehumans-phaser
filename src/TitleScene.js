@@ -43,6 +43,8 @@ class TitleScene extends Phaser.Scene {
 
     this.space = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
     this.space.on('up', () => {
+      let gs = this.scene.get(SCENE_GAME);
+      gs.state = 'new';
       this.scene.switch(SCENE_GAME);
     });
   }
