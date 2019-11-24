@@ -1,8 +1,8 @@
 class GameScene extends Phaser.Scene {
-  // Public
+  // Public.
   state = 'new';
 
-  //private
+  // Private.
   #background = null;
   #bounds = 105;
   #bull = null;
@@ -22,6 +22,7 @@ class GameScene extends Phaser.Scene {
   #scoreText = null;
   #speed = 0;
   #speedIncrement = 0.1;
+  #speedIndicator = null;
   #speedMax = 20;
   #timer = 0;
   #timerText = 0;
@@ -58,6 +59,16 @@ class GameScene extends Phaser.Scene {
     this.#ole = this.sound.add('ole', {volume: 0.1});
 
     this.#background = this.add.tileSprite(this.#config.width / 2, this.#config.height / 2, this.#config.width, this.#config.height, 'bg');
+
+    let speedBg = this.add.rectangle(this.#config.width - 40, this.#config.height - 100, 20, 100, 0xffffff);
+    speedBg.setStrokeStyle(2, 0xffffff);
+
+    var graphics = this.add.graphics();
+    graphics.fillGradientStyle(0xff0000, 0xff0000, 0xffff00, 0xffff00, 1);
+    graphics.fillRect(this.#config.width - 50, this.#config.height - 150, 20, 100);
+
+    this.#speedIndicator = this.add.rectangle(this.#config.width - 40, this.#config.height - 100, 20, 100, 0xffffff);
+    this.#speedIndicator.setStrokeStyle(2, 0xffffff);
 
     this.#scoreText = this.add.text(16, 16, ``, {
       fontSize: '32px',
@@ -192,6 +203,13 @@ class GameScene extends Phaser.Scene {
     }
   }
 
+  setSpeed(speed) {
+    speed = Math.max(speed, 0);
+    speed = Math.min(speed, this.#speedMax);
+    this.#speedIndicator.height = 100 - (100 / this.#speedMax) * speed;
+    this.#speed = speed;
+  }
+
   update(time) {
     if (this.state === 'new') {
       this.reset();
@@ -202,10 +220,10 @@ class GameScene extends Phaser.Scene {
       this.#timer += Date.now() - this.#lastTime;
       this.updateTimer();
       if (this.#cursors.up.isDown) {
-        this.#speed = Math.min(this.#speed + this.#speedIncrement, this.#speedMax);
+        this.setSpeed(this.#speed + this.#speedIncrement);
       }
       else if (this.#cursors.down.isDown) {
-        this.#speed = Math.max(0, this.#speed - this.#speedIncrement);
+        this.setSpeed(this.#speed - this.#speedIncrement);
       }
       else if (this.#cursors.right.isDown) {
         this.#bullPositionX += this.#bullPositionXSpeed;
@@ -266,11 +284,20 @@ class GameScene extends Phaser.Scene {
 
   reset() {
     this.clear();
+
+    var first = true;
+
     Phaser.Actions.Call(this.#runnerGroup.getChildren(), runner => {
       let runner_position_x = Phaser.Math.Between(this.#bounds, this.#config.width - (2 * this.#bounds));
       let runner_position_y = Phaser.Math.Between(this.#config.height - 200, this.#config.height - 250);
       runner.setPosition(runner_position_x, runner_position_y);
-      runner.speed = Phaser.Math.Between(2, this.#speedMax - 5);
+      // Always have one runner at top speed to make timings fair.
+      if (first) {
+        runner.speed = this.#speedMax - 6;
+        first = false;
+      } else {
+        runner.speed = Phaser.Math.Between(2, this.#speedMax - 6);
+      }
       runner.anims.play('standing', true);
       runner.caught = false;
     }, this);
