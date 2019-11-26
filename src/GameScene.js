@@ -10,6 +10,8 @@ class GameScene extends Phaser.Scene {
   #bullPositionXSpeed = 20;
   #config = {};
   #cursors = null;
+  #bestTimeImage = null;
+  #bestTimeEmitter = null;
   #missed = null;
   #lastTime = null;
   #missedScore = 0;
@@ -35,6 +37,7 @@ class GameScene extends Phaser.Scene {
   preload() {
     this.load.image('bg', 'assets/bg.png');
     this.load.image('bull', 'assets/bull.png');
+    this.load.image('best_time', 'assets/best_time.png');
     this.load.spritesheet('runner',
         'assets/runner.png',
         {frameWidth: 40, frameHeight: 40}
@@ -94,7 +97,7 @@ class GameScene extends Phaser.Scene {
     this.#bull.setCollideWorldBounds(true);
     this.#bull.body.onWorldBounds = true;
     this.physics.world.on('worldbounds', () => {
-      this.hitWorldBounds
+      this.hitWorldBounds();
     });
 
     this.anims.create({
@@ -164,8 +167,7 @@ class GameScene extends Phaser.Scene {
   }
 
   hitWorldBounds(body) {
-    this.#bullPositionX = 0;
-    body.setVelocityX(0);
+    this.#bull.setVelocityX(0);
   }
 
   gotRunner(bull, runner) {
@@ -248,8 +250,39 @@ class GameScene extends Phaser.Scene {
 
   showResult() {
     let seconds = this.#timer / 1000;
+
+    let totalTime = (seconds + (this.#missedScore * 5)).toFixed(1);
+    let scoreScreen = this.scene.get(SCENE_TITLE);
+    let bestTime = scoreScreen.setBestTime(totalTime);
+
+    if (bestTime) {
+      if (this.#bestTimeImage) {
+        this.#bestTimeImage.setVisible(true);
+        this.#bestTimeEmitter.start();
+      }
+      else {
+        let particles = this.add.particles('red');
+
+        this.#bestTimeEmitter = particles.createEmitter({
+          speed: 100,
+          scale: {start: 1, end: 0},
+          blendMode: 'ADD'
+        });
+
+        let bti = this.physics.add.image(400, 100, 'best_time');
+
+        bti.setVelocity(100, 200);
+        bti.setBounce(1, 1);
+        bti.setCollideWorldBounds(true);
+
+        this.#bestTimeEmitter.startFollow(bti);
+
+        this.#bestTimeImage = bti;
+      }
+    }
+
     let text = `
-    Score: ${(seconds + (this.#missedScore * 5)).toFixed(1)}
+    Total: ${totalTime}
     =
     Time: ${seconds.toFixed(1)}
     +
@@ -274,12 +307,14 @@ class GameScene extends Phaser.Scene {
     this.#bullPositionX = config.width / 2;
     this.#lastTime = Date.now();
     this.#timer = 0;
-    this.#bull.setVelocityX(0);
     this.updateScore();
     this.updateTimer(0);
     this.#music.stop();
     this.#resultsText.setText('');
-
+    if (this.#bestTimeImage) {
+      this.#bestTimeImage.setVisible(false);
+      this.#bestTimeEmitter.stop();
+    }
   }
 
   reset() {
@@ -295,7 +330,8 @@ class GameScene extends Phaser.Scene {
       if (first) {
         runner.speed = this.#speedMax - 6;
         first = false;
-      } else {
+      }
+      else {
         runner.speed = Phaser.Math.Between(2, this.#speedMax - 6);
       }
       runner.anims.play('standing', true);
