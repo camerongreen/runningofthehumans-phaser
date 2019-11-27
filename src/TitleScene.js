@@ -75,7 +75,7 @@ class TitleScene extends Phaser.Scene {
     var previousBestTime = this.#bestTime;
     if (time < this.#bestTime) {
       this.#bestTime = time;
-      this.#scoreText.setText(`Best time: ${time}`);
+      this.#scoreText.setText(`Best time: ${time.toFixed(1)}`);
 
       if (previousBestTime !== Number.MAX_SAFE_INTEGER) {
         return true;

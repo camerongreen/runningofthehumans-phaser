@@ -7,7 +7,7 @@ class GameScene extends Phaser.Scene {
   #bounds = 105;
   #bull = null;
   #bullPositionX = 0;
-  #bullPositionXSpeed = 20;
+  #bullPositionXSpeed = 25;
   #config = {};
   #cursors = null;
   #bestTimeText = null;
@@ -253,7 +253,7 @@ class GameScene extends Phaser.Scene {
   showResult() {
     let seconds = this.#timer / 1000;
 
-    let totalTime = (seconds + (this.#missedScore * 5)).toFixed(1);
+    let totalTime = seconds + (this.#missedScore * 5);
     let scoreScreen = this.scene.get(SCENE_TITLE);
     let bestTime = scoreScreen.setBestTime(totalTime);
 
@@ -291,7 +291,7 @@ class GameScene extends Phaser.Scene {
     }
 
     let text = `
-    Total: ${totalTime}
+    Total: ${totalTime.toFixed(1)}
     =
     Time: ${seconds.toFixed(1)}
     +
@@ -342,7 +342,7 @@ class GameScene extends Phaser.Scene {
         first = false;
       }
       else {
-        runner.speed = Phaser.Math.Between(2, this.#speedMax - 6);
+        runner.speed = Phaser.Math.Between(4, this.#speedMax - 6);
       }
       runner.anims.play('standing', true);
       runner.caught = false;
