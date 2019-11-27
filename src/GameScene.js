@@ -10,7 +10,7 @@ class GameScene extends Phaser.Scene {
   #bullPositionXSpeed = 20;
   #config = {};
   #cursors = null;
-  #bestTimeImage = null;
+  #bestTimeText = null;
   #bestTimeEmitter = null;
   #missed = null;
   #lastTime = null;
@@ -38,6 +38,8 @@ class GameScene extends Phaser.Scene {
     this.load.image('bg', 'assets/bg.png');
     this.load.image('bull', 'assets/bull.png');
     this.load.image('best_time', 'assets/best_time.png');
+    this.load.image('red', 'assets/red.png');
+
     this.load.spritesheet('runner',
         'assets/runner.png',
         {frameWidth: 40, frameHeight: 40}
@@ -256,8 +258,8 @@ class GameScene extends Phaser.Scene {
     let bestTime = scoreScreen.setBestTime(totalTime);
 
     if (bestTime) {
-      if (this.#bestTimeImage) {
-        this.#bestTimeImage.setVisible(true);
+      if (this.#bestTimeText) {
+        this.#bestTimeText.setVisible(true);
         this.#bestTimeEmitter.start();
       }
       else {
@@ -269,15 +271,22 @@ class GameScene extends Phaser.Scene {
           blendMode: 'ADD'
         });
 
-        let bti = this.physics.add.image(400, 100, 'best_time');
+        let btt = this.add.text(0, 0, 'Best time!', {
+          fontSize: '32px',
+          fill: '#FF0000'
+        }).setOrigin(0.5);
 
-        bti.setVelocity(100, 200);
-        bti.setBounce(1, 1);
-        bti.setCollideWorldBounds(true);
+        let container = this.add.container(400, 100, [btt]);
 
-        this.#bestTimeEmitter.startFollow(bti);
+        this.physics.world.enableBody(container);
 
-        this.#bestTimeImage = bti;
+        container.body.setVelocity(100, 200);
+        container.body.setBounce(1, 1);
+        container.body.setCollideWorldBounds(true);
+
+        this.#bestTimeEmitter.startFollow(container);
+
+        this.#bestTimeText = container;
       }
     }
 
@@ -311,8 +320,8 @@ class GameScene extends Phaser.Scene {
     this.updateTimer(0);
     this.#music.stop();
     this.#resultsText.setText('');
-    if (this.#bestTimeImage) {
-      this.#bestTimeImage.setVisible(false);
+    if (this.#bestTimeText) {
+      this.#bestTimeText.setVisible(false);
       this.#bestTimeEmitter.stop();
     }
   }
