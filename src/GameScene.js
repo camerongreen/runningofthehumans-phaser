@@ -313,7 +313,8 @@ class GameScene extends Phaser.Scene {
     this.#score = 0;
     this.#missedScore = 0;
     this.#speed = 0;
-    this.#bullPositionX = config.width / 2;
+    this.#bullPositionX = 0;
+    this.#bull.x = config.width / 2;
     this.#lastTime = Date.now();
     this.#timer = 0;
     this.updateScore();
