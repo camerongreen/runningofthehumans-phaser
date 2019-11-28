@@ -1,13 +1,18 @@
 class GameScene extends Phaser.Scene {
+  // Constants.
+  #bounds = 105;
+  #bullPositionXSpeed = 25;
+  #missedPenalty = 5;
+  #speedIncrement = 0.1;
+  #speedMax = 20;
+
   // Public.
   state = 'new';
 
   // Private.
   #background = null;
-  #bounds = 105;
   #bull = null;
   #bullPositionX = 0;
-  #bullPositionXSpeed = 25;
   #config = {};
   #cursors = null;
   #bestTimeText = null;
@@ -23,9 +28,7 @@ class GameScene extends Phaser.Scene {
   #score = 0;
   #scoreText = null;
   #speed = 0;
-  #speedIncrement = 0.1;
   #speedIndicator = null;
-  #speedMax = 20;
   #timer = 0;
   #timerText = 0;
 
@@ -190,6 +193,16 @@ class GameScene extends Phaser.Scene {
       this.#missed.play();
       this.#score += 1;
       this.#missedScore += 1;
+      let missedText = this.add.text(runner.x, this.#config.height - 25, `${this.#missedPenalty} secs`, {
+        fontSize: '22px',
+        fill: '#F00'
+      }).setOrigin(0.5);
+      this.tweens.add({
+        targets: missedText,
+        alpha: 0,
+        duration: 2000,
+        ease: 'Power2'
+      }, this);
       this.updateScore();
       runner.caught = true;
       runner.speed = 0;
@@ -253,7 +266,7 @@ class GameScene extends Phaser.Scene {
   showResult() {
     let seconds = this.#timer / 1000;
 
-    let totalTime = seconds + (this.#missedScore * 5);
+    let totalTime = seconds + (this.#missedScore * this.#missedPenalty);
     let scoreScreen = this.scene.get(SCENE_TITLE);
     let bestTime = scoreScreen.setBestTime(totalTime);
 
@@ -295,7 +308,7 @@ class GameScene extends Phaser.Scene {
     =
     Time: ${seconds.toFixed(1)}
     +
-    Missed runners: ${this.#missedScore} * 5 secs
+    Missed runners: ${this.#missedScore} * ${this.#missedPenalty} secs
     `;
     this.#resultsText.setText(text);
   }
