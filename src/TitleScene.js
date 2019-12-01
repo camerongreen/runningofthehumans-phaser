@@ -9,7 +9,7 @@ export class TitleScene extends Phaser.Scene {
 
   constructor(name, config) {
     super(name);
-    this.config = config;
+    this.#config = config;
   }
 
   preload() {
@@ -18,10 +18,10 @@ export class TitleScene extends Phaser.Scene {
   }
 
   create() {
-    this.add.tileSprite(this.config.width / 2, this.config.height / 2, this.config.width, this.config.height, 'bg');
-    this.physics.add.sprite(this.config.width / 2, this.config.height - 78, 'bull');
+    this.add.tileSprite(this.#config.width / 2, this.#config.height / 2, this.#config.width, this.#config.height, 'bg');
+    this.physics.add.sprite(this.#config.width / 2, this.#config.height - 78, 'bull');
 
-    let title = this.add.text(this.config.width / 2, this.config.height / 4, 'Running of the humans', {
+    let title = this.add.text(this.#config.width / 2, this.#config.height / 4, 'Running of the humans', {
       font: 'bold 50px Verdana',
       fill: '#F00',
       stroke: '#FFF',
@@ -38,7 +38,7 @@ export class TitleScene extends Phaser.Scene {
     Press [space] to start and pause.
     `;
 
-    let instructions = this.add.text(this.config.width / 2, this.config.height / 2, text, {
+    let instructions = this.add.text(this.#config.width / 2, this.#config.height / 2, text, {
       font: 'bold 28px Arial',
       fill: '#fff',
       align: "center",
@@ -46,7 +46,7 @@ export class TitleScene extends Phaser.Scene {
 
     instructions.setShadow(3, 4, 'rgba(0,0,0,0.5', 5);
 
-    this.#scoreText = this.add.text(this.config.width / 2, this.config.height / 1.2, '', {
+    this.#scoreText = this.add.text(this.#config.width / 2, this.#config.height / 1.2, '', {
       font: 'bold 28px Arial',
       fill: '#fff',
       align: "center",
