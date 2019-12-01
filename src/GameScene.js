@@ -1,8 +1,11 @@
-class GameScene extends Phaser.Scene {
+import {TitleScene} from "./TitleScene.js";
+
+export class GameScene extends Phaser.Scene {
   // Constants.
   #bounds = 105;
   #bullPositionXSpeed = 25;
   #missedPenalty = 5;
+  #runnersNum = 10;
   #speedIncrement = 0.1;
   #speedMax = 20;
 
@@ -23,7 +26,6 @@ class GameScene extends Phaser.Scene {
   #music = null;
   #ole = null;
   #runnerGroup = null;
-  #runnersNum = 5;
   #resultsText = null;
   #score = 0;
   #scoreText = null;
@@ -38,33 +40,33 @@ class GameScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image('bg', 'assets/bg.png');
-    this.load.image('bull', 'assets/bull.png');
-    this.load.image('best_time', 'assets/best_time.png');
-    this.load.image('red', 'assets/red.png');
+    this.load.image('bg', 'assets/img/bg.png');
+    this.load.image('bull', 'assets/img/bull.png');
+    this.load.image('best_time', 'assets/img/best_time.png');
+    this.load.image('red', 'assets/img/red.png');
 
     this.load.spritesheet('runner',
-        'assets/runner.png',
-        {frameWidth: 40, frameHeight: 40}
+      'assets/img/runner.png',
+      { frameWidth: 40, frameHeight: 40 },
     );
     this.load.audio('missed', [
-      'assets/missed.ogg',
-      'assets/missed.mp3',
+      'assets/audio/missed.ogg',
+      'assets/audio/missed.mp3',
     ]);
     this.load.audio('music', [
-      'assets/espana.ogg',
-      'assets/espana.mp3',
+      'assets/audio/espana.ogg',
+      'assets/audio/espana.mp3',
     ]);
     this.load.audio('ole', [
-      'assets/ole.ogg',
-      'assets/ole.mp3',
+      'assets/audio/ole.ogg',
+      'assets/audio/ole.mp3',
     ]);
   }
 
   create() {
-    this.#missed = this.sound.add('missed', {volume: 0.1});
+    this.#missed = this.sound.add('missed', { volume: 0.1 });
     this.#music = this.sound.add('music');
-    this.#ole = this.sound.add('ole', {volume: 0.1});
+    this.#ole = this.sound.add('ole', { volume: 0.1 });
 
     this.#background = this.add.tileSprite(this.#config.width / 2, this.#config.height / 2, this.#config.width, this.#config.height, 'bg');
 
@@ -80,12 +82,12 @@ class GameScene extends Phaser.Scene {
 
     this.#scoreText = this.add.text(16, 16, ``, {
       fontSize: '32px',
-      fill: '#000'
+      fill: '#000',
     });
 
     this.#timerText = this.add.text(this.#config.width - 210, 16, ``, {
       fontSize: '32px',
-      fill: '#000'
+      fill: '#000',
     });
 
     this.#resultsText = this.add.text(this.#config.width / 2, this.#config.height / 2, ``, {
@@ -107,21 +109,21 @@ class GameScene extends Phaser.Scene {
 
     this.anims.create({
       key: 'running',
-      frames: this.anims.generateFrameNumbers('runner', {start: 0, end: 5}),
+      frames: this.anims.generateFrameNumbers('runner', { start: 0, end: 5 }),
       frameRate: 10,
-      repeat: -1
+      repeat: -1,
     });
 
     this.anims.create({
       key: 'caught',
-      frames: [{key: 'runner', frame: 6}],
-      frameRate: 20
+      frames: [{ key: 'runner', frame: 6 }],
+      frameRate: 20,
     });
 
     this.anims.create({
       key: 'standing',
-      frames: [{key: 'runner', frame: 0}],
-      frameRate: 20
+      frames: [{ key: 'runner', frame: 0 }],
+      frameRate: 20,
     });
 
     this.#runnerGroup = this.physics.add.group({
@@ -148,7 +150,7 @@ class GameScene extends Phaser.Scene {
           break;
         case 'ended':
           this.#music.stop();
-          this.scene.switch(SCENE_TITLE);
+          this.scene.switch(TitleScene.name);
           break;
         case 'ready':
           this.state = 'running';
@@ -195,13 +197,13 @@ class GameScene extends Phaser.Scene {
       this.#missedScore += 1;
       let missedText = this.add.text(runner.x, this.#config.height - 25, `${this.#missedPenalty} secs`, {
         fontSize: '22px',
-        fill: '#F00'
+        fill: '#F00',
       }).setOrigin(0.5);
       this.tweens.add({
         targets: missedText,
         alpha: 0,
         duration: 2000,
-        ease: 'Power2'
+        ease: 'Power2',
       }, this);
       this.updateScore();
       runner.caught = true;
@@ -267,7 +269,7 @@ class GameScene extends Phaser.Scene {
     let seconds = this.#timer / 1000;
 
     let totalTime = seconds + (this.#missedScore * this.#missedPenalty);
-    let scoreScreen = this.scene.get(SCENE_TITLE);
+    let scoreScreen = this.scene.get(TitleScene.name);
     let bestTime = scoreScreen.setBestTime(totalTime);
 
     if (bestTime) {
@@ -280,13 +282,13 @@ class GameScene extends Phaser.Scene {
 
         this.#bestTimeEmitter = particles.createEmitter({
           speed: 100,
-          scale: {start: 1, end: 0},
-          blendMode: 'ADD'
+          scale: { start: 1, end: 0 },
+          blendMode: 'ADD',
         });
 
         let btt = this.add.text(0, 0, 'Best time!', {
           fontSize: '32px',
-          fill: '#FF0000'
+          fill: '#FF0000',
         }).setOrigin(0.5);
 
         let container = this.add.container(400, 100, [btt]);
@@ -327,7 +329,7 @@ class GameScene extends Phaser.Scene {
     this.#missedScore = 0;
     this.#speed = 0;
     this.#bullPositionX = 0;
-    this.#bull.x = config.width / 2;
+    this.#bull.x = this.#config.width / 2;
     this.#lastTime = Date.now();
     this.#timer = 0;
     this.updateScore();
@@ -363,3 +365,4 @@ class GameScene extends Phaser.Scene {
   }
 
 }
+
