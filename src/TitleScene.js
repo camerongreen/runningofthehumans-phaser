@@ -1,4 +1,7 @@
-class TitleScene extends Phaser.Scene {
+import {GameScene} from "./GameScene";
+
+export class TitleScene extends Phaser.Scene {
+  // Private vars.
   #bestTime = Number.MAX_SAFE_INTEGER;
   #config = {};
   #scoreText = null;
@@ -10,8 +13,8 @@ class TitleScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.image('bg', 'assets/bg.png');
-    this.load.image('bull', 'assets/bull.png');
+    this.load.image('bg', 'assets/img/bg.png');
+    this.load.image('bull', 'assets/img/bull.png');
   }
 
   create() {
@@ -53,9 +56,9 @@ class TitleScene extends Phaser.Scene {
 
     this.space = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
     this.space.on('up', () => {
-      let gs = this.scene.get(SCENE_GAME);
+      let gs = this.scene.get(GameScene.name);
       gs.state = 'new';
-      this.scene.switch(SCENE_GAME);
+      this.scene.switch(GameScene.name);
     });
   }
 
@@ -86,3 +89,4 @@ class TitleScene extends Phaser.Scene {
   }
 
 }
+
