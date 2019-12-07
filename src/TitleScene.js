@@ -1,15 +1,11 @@
-import {GameScene} from "./GameScene";
-
-export class TitleScene extends Phaser.Scene {
-  // Private vars.
-  #bestTime = Number.MAX_SAFE_INTEGER;
-  #config = {};
-  #scoreText = null;
-  #space = null;
-
+class TitleScene extends Phaser.Scene {
   constructor(name, config) {
     super(name);
-    this.#config = config;
+    this.config = config;
+
+    this.bestTime = Number.MAX_SAFE_INTEGER;
+    this.scoreText = null;
+    this.space = null;
   }
 
   preload() {
@@ -18,10 +14,10 @@ export class TitleScene extends Phaser.Scene {
   }
 
   create() {
-    this.add.tileSprite(this.#config.width / 2, this.#config.height / 2, this.#config.width, this.#config.height, 'bg');
-    this.physics.add.sprite(this.#config.width / 2, this.#config.height - 78, 'bull');
+    this.add.tileSprite(this.config.width / 2, this.config.height / 2, this.config.width, this.config.height, 'bg');
+    this.physics.add.sprite(this.config.width / 2, this.config.height - 78, 'bull');
 
-    let title = this.add.text(this.#config.width / 2, this.#config.height / 4, 'Running of the humans', {
+    const title = this.add.text(this.config.width / 2, this.config.height / 4, 'Running of the humans', {
       font: 'bold 50px Verdana',
       fill: '#F00',
       stroke: '#FFF',
@@ -38,25 +34,25 @@ export class TitleScene extends Phaser.Scene {
     Press [space] to start and pause.
     `;
 
-    let instructions = this.add.text(this.#config.width / 2, this.#config.height / 2, text, {
+    const instructions = this.add.text(this.config.width / 2, this.config.height / 2, text, {
       font: 'bold 28px Arial',
       fill: '#fff',
-      align: "center",
+      align: 'center',
     }).setOrigin(0.5);
 
     instructions.setShadow(3, 4, 'rgba(0,0,0,0.5', 5);
 
-    this.#scoreText = this.add.text(this.#config.width / 2, this.#config.height / 1.2, '', {
+    this.scoreText = this.add.text(this.config.width / 2, this.config.height / 1.2, '', {
       font: 'bold 28px Arial',
       fill: '#fff',
-      align: "center",
+      align: 'center',
     }).setOrigin(0.5);
 
-    this.#scoreText.setShadow(3, 4, 'rgba(0,0,0,0.5', 5);
+    this.scoreText.setShadow(3, 4, 'rgba(0,0,0,0.5', 5);
 
     this.space = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
     this.space.on('up', () => {
-      let gs = this.scene.get(GameScene.name);
+      const gs = this.scene.get(GameScene.name);
       gs.state = 'new';
       this.scene.switch(GameScene.name);
     });
@@ -75,10 +71,10 @@ export class TitleScene extends Phaser.Scene {
    *
    */
   setBestTime(time) {
-    var previousBestTime = this.#bestTime;
-    if (time < this.#bestTime) {
-      this.#bestTime = time;
-      this.#scoreText.setText(`Best time: ${time.toFixed(1)}`);
+    const previousBestTime = this.bestTime;
+    if (time < this.bestTime) {
+      this.bestTime = time;
+      this.scoreText.setText(`Best time: ${time.toFixed(1)}`);
 
       if (previousBestTime !== Number.MAX_SAFE_INTEGER) {
         return true;
@@ -87,6 +83,4 @@ export class TitleScene extends Phaser.Scene {
 
     return false;
   }
-
 }
-
