@@ -52,9 +52,9 @@ class TitleScene extends Phaser.Scene {
 
     this.space = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
     this.space.on('up', () => {
-      const gs = this.scene.get(GameScene.name);
+      const gs = this.scene.get('GameScene');
       gs.state = 'new';
-      this.scene.switch(GameScene.name);
+      this.scene.switch('GameScene');
     });
   }
 
@@ -84,3 +84,5 @@ class TitleScene extends Phaser.Scene {
     return false;
   }
 }
+
+export default TitleScene;

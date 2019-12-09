@@ -80,17 +80,17 @@ class GameScene extends Phaser.Scene {
       this.config.height - 100, 20, 100, 0xffffff);
     this.speedIndicator.setStrokeStyle(2, 0xffffff);
 
-    this.scoreText = this.add.text(16, 16, ``, {
+    this.scoreText = this.add.text(16, 16, '', {
       fontSize: '32px',
       fill: '#000',
     });
 
-    this.timerText = this.add.text(this.config.width - 210, 16, ``, {
+    this.timerText = this.add.text(this.config.width - 210, 16, '', {
       fontSize: '32px',
       fill: '#000',
     });
 
-    this.resultsText = this.add.text(this.config.width / 2, this.config.height / 2, ``, {
+    this.resultsText = this.add.text(this.config.width / 2, this.config.height / 2, '', {
       font: 'bold 28px Arial',
       fill: '#fff',
       align: 'center',
@@ -133,7 +133,7 @@ class GameScene extends Phaser.Scene {
     });
 
     this.physics.add.overlap(this.bull, this.runnerGroup.getChildren(), (bull, runner) => {
-      this.gotRunner(bull, runner);
+      this.gotRunner(runner);
     }, null, this);
 
     this.cursors = this.input.keyboard.createCursorKeys();
@@ -151,7 +151,7 @@ class GameScene extends Phaser.Scene {
           break;
         case 'ended':
           this.music.stop();
-          this.scene.switch(TitleScene.name);
+          this.scene.switch('TitleScene');
           break;
         case 'ready':
           this.state = 'running';
@@ -181,14 +181,15 @@ class GameScene extends Phaser.Scene {
     this.bull.setVelocityX(0);
   }
 
-  gotRunner(bull, runner) {
+  gotRunner(runner) {
     if (!runner.caught) {
+      const rnr = runner;
       this.ole.play();
-      runner.anims.play('caught', true);
+      rnr.anims.play('caught', true);
       this.score += 1;
       this.updateScore();
-      runner.caught = true;
-      runner.speed = 0;
+      rnr.caught = true;
+      rnr.speed = 0;
 
       this.checkFinish();
     }
@@ -196,10 +197,11 @@ class GameScene extends Phaser.Scene {
 
   missedRunner(runner) {
     if (!runner.caught) {
+      const rnr = runner;
       this.missed.play();
       this.score += 1;
       this.missedScore += 1;
-      const missedText = this.add.text(runner.x, this.config.height - 25, `${this.missedPenalty} secs`, {
+      const missedText = this.add.text(rnr.x, this.config.height - 25, `${this.missedPenalty} secs`, {
         fontSize: '22px',
         fill: '#F00',
       }).setOrigin(0.5);
@@ -210,8 +212,8 @@ class GameScene extends Phaser.Scene {
         ease: 'Power2',
       }, this);
       this.updateScore();
-      runner.caught = true;
-      runner.speed = 0;
+      rnr.caught = true;
+      rnr.speed = 0;
 
       this.checkFinish();
     }
@@ -257,8 +259,9 @@ class GameScene extends Phaser.Scene {
       this.background.tilePositionY -= this.speed;
 
       Phaser.Actions.Call(this.runnerGroup.getChildren(), (runner) => {
-        runner.y += this.speed - runner.speed;
-        if (runner.y > this.config.height + 10) {
+        const rnr = runner;
+        rnr.y += this.speed - rnr.speed;
+        if (rnr.y > this.config.height + 10) {
           this.missedRunner(runner);
         }
       }, this);
@@ -270,7 +273,7 @@ class GameScene extends Phaser.Scene {
     const seconds = this.timer / 1000;
 
     const totalTime = seconds + (this.missedScore * this.missedPenalty);
-    const scoreScreen = this.scene.get(TitleScene.name);
+    const scoreScreen = this.scene.get('TitleScene');
     const bestTime = scoreScreen.setBestTime(totalTime);
 
     if (bestTime) {
@@ -350,16 +353,20 @@ class GameScene extends Phaser.Scene {
     Phaser.Actions.Call(this.runnerGroup.getChildren(), (runner) => {
       const runnerX = Phaser.Math.Between(this.bounds, this.config.width - (2 * this.bounds));
       const runnerY = Phaser.Math.Between(this.config.height - 200, this.config.height - 250);
-      runner.setPosition(runnerX, runnerY);
+
+      const rnr = runner;
+      rnr.setPosition(runnerX, runnerY);
       // Always have one runner at top speed to make timings fair.
       if (first) {
-        runner.speed = this.speedMax - 6;
+        rnr.speed = this.speedMax - 6;
         first = false;
       } else {
-        runner.speed = Phaser.Math.Between(4, this.speedMax - 6);
+        rnr.speed = Phaser.Math.Between(4, this.speedMax - 6);
       }
-      runner.anims.play('standing', true);
-      runner.caught = false;
+      rnr.anims.play('standing', true);
+      rnr.caught = false;
     }, this);
   }
 }
+
+export default GameScene;
