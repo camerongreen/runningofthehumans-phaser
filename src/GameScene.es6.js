@@ -179,6 +179,7 @@ class GameScene extends Phaser.Scene {
 
   hitWorldBounds() {
     this.bull.setVelocityX(0);
+    this.bullPositionX = 0;
   }
 
   gotRunner(runner) {
