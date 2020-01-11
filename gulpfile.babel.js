@@ -16,7 +16,7 @@ function clean() {
 
 function javascript() {
   return src([
-    'src/*.es6.js',
+    'src/*.js',
     'gulpfile.babel.js',
   ])
     .pipe(eslint())
@@ -41,20 +41,21 @@ function browserSyncReload(done) {
 }
 
 function transpile() {
-  return src('src/*.es6.js')
+  return src('src/*.js')
+    .pipe(concat(`../${outputDir}/game.min.js`))
     .pipe(babel())
-    .pipe(concat(`../${outputDir}/game.js`))
     .pipe(terser())
     .pipe(dest(outputDir))
     .pipe(browserSync.stream());
 }
 
 function watchFiles() {
-  watch('dist/game.js', browserSyncReload);
+  watch('src/*.js', transpile);
+  watch('dist/main.js', browserSyncReload);
 }
 
 exports.lint = series(javascript);
 exports.clean = series(clean);
 exports.build = series(exports.clean, exports.lint, transpile);
-exports.watch = series(javascript, transpile, liveReload, watchFiles);
+exports.watch = series(exports.build, liveReload, watchFiles);
 exports.default = exports.watch;

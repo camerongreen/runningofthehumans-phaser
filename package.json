@@ -33,6 +33,7 @@
     "gulp-newer": "^1.4.0",
     "gulp-plumber": "^1.2.1",
     "gulp-terser": "^1.2.0",
+    "gulp-uglify": "^3.0.2",
     "imagemin": "^7.0.1",
     "path": "^0.12.7",
     "raw-loader": "^1.0.0"
