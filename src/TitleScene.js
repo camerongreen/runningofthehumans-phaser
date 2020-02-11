@@ -1,3 +1,6 @@
+/**
+ * Handle the title scene in the game.
+ */
 export default class TitleScene extends Phaser.Scene {
   constructor(name, config) {
     super(name);
@@ -8,11 +11,17 @@ export default class TitleScene extends Phaser.Scene {
     this.space = null;
   }
 
+  /**
+   * Preload assets before scene begins.
+   */
   preload() {
     this.load.image('bg', 'assets/img/bg.png');
     this.load.image('bull', 'assets/img/bull.png');
   }
 
+  /**
+   * Create most of the elements the scene uses.
+   */
   create() {
     this.add.tileSprite(this.config.width / 2, this.config.height / 2, this.config.width, this.config.height, 'bg');
     this.physics.add.sprite(this.config.width / 2, this.config.height - 78, 'bull');
@@ -27,8 +36,8 @@ export default class TitleScene extends Phaser.Scene {
     title.setShadow(3, 4, 'rgba(0,0,0,0.5', 5, true, false);
 
     const text = `
-    Use your cursor keys to
-    help the bull run over drunk
+    Use your cursor keys [<- ->] to
+    help the bull deal with drunken
     tourists in Pamplona, Spain. 
     
     Press [space] to start and pause.

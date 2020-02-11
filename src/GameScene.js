@@ -1,3 +1,6 @@
+/**
+ * Handle the actions of the game.
+ */
 export default class GameScene extends Phaser.Scene {
   constructor(name, config) {
     super(name);
@@ -36,6 +39,9 @@ export default class GameScene extends Phaser.Scene {
     this.timerText = 0;
   }
 
+  /**
+   * Preload assets before game begins.
+   */
   preload() {
     this.load.image('bg', 'assets/img/bg.png');
     this.load.image('bull', 'assets/img/bull.png');
@@ -60,6 +66,9 @@ export default class GameScene extends Phaser.Scene {
     ]);
   }
 
+  /**
+   * Create most of the elements the game uses.
+   */
   create() {
     this.missed = this.sound.add('missed', { volume: 0.1 });
     this.music = this.sound.add('music');
@@ -177,11 +186,20 @@ export default class GameScene extends Phaser.Scene {
     this.music.resume();
   }
 
+  /**
+   * What to do when we hit the sides.
+   */
   hitWorldBounds() {
     this.bull.setVelocityX(0);
     this.bullPositionX = 0;
   }
 
+  /**
+   * Got him!  Do stuff when that happens.
+   *
+   * @param object runner
+   *   One of the runners.
+   */
   gotRunner(runner) {
     if (!runner.caught) {
       const rnr = runner;
@@ -196,12 +214,20 @@ export default class GameScene extends Phaser.Scene {
     }
   }
 
+  /**
+   * If we miss a runner, we tell the user
+   * and add a penalty.
+   *
+   * @param runner
+   */
   missedRunner(runner) {
     if (!runner.caught) {
       const rnr = runner;
-      this.missed.play();
       this.score += 1;
       this.missedScore += 1;
+      // Show a bit of dissappearing text to the user
+      // and play a sound.
+      this.missed.play();
       const missedText = this.add.text(rnr.x, this.config.height - 25, `${this.missedPenalty} secs`, {
         fontSize: '22px',
         fill: '#F00',
@@ -220,6 +246,9 @@ export default class GameScene extends Phaser.Scene {
     }
   }
 
+  /**
+   * Have we finished?
+   */
   checkFinish() {
     // Game over.
     if (this.score === this.runnersNum) {
@@ -229,6 +258,12 @@ export default class GameScene extends Phaser.Scene {
     }
   }
 
+  /**
+   * Set the pace at which the world scrolls.
+   *
+   * @param int speed
+   *   Speed to set, forces great than zero and less than speedMax.
+   */
   setSpeed(speed) {
     let gameSpeed = Math.max(speed, 0);
     gameSpeed = Math.min(gameSpeed, this.speedMax);
@@ -236,6 +271,9 @@ export default class GameScene extends Phaser.Scene {
     this.speed = gameSpeed;
   }
 
+  /**
+   * What to do on each tick of the game engine.
+   */
   update() {
     if (this.state === 'new') {
       this.reset();
@@ -270,6 +308,9 @@ export default class GameScene extends Phaser.Scene {
     this.lastTime = Date.now();
   }
 
+  /**
+   * Show final time etc.
+   */
   showResult() {
     const seconds = this.timer / 1000;
 
@@ -319,15 +360,24 @@ export default class GameScene extends Phaser.Scene {
     this.resultsText.setText(text);
   }
 
+  /**
+   * Show latest score.
+   */
   updateScore() {
     this.scoreText.setText(`Runners: ${this.score}/${this.runnersNum}`);
   }
 
+  /**
+   * Update time during game.
+   */
   updateTimer() {
     const seconds = this.timer / 1000;
     this.timerText.setText(`Time: ${seconds.toFixed(1).padStart(4, ' ')}`);
   }
 
+  /**
+   * Clear variables etc. to default state.
+   */
   clear() {
     this.score = 0;
     this.missedScore = 0;
@@ -346,6 +396,9 @@ export default class GameScene extends Phaser.Scene {
     }
   }
 
+  /**
+   * Reset the game.
+   */
   reset() {
     this.clear();
 
