@@ -1,22 +1,28 @@
 const {
   dest, series, src, watch,
 } = require('gulp');
-const babel = require('gulp-babel');
 const browserSync = require('browser-sync').create();
-const concat = require('gulp-concat');
 const del = require('del');
 const eslint = require('gulp-eslint');
-const terser = require('gulp-terser');
+const browserify = require('browserify');
+const babelify = require('babelify');
+const uglify = require('gulp-uglify');
+const buffer = require('vinyl-buffer');
+const source = require('vinyl-source-stream');
 
-const outputDir = 'dist';
+const paths = {
+  source: 'src',
+  output: 'dist',
+  base: './',
+};
 
 function clean() {
-  return del([outputDir]);
+  return del([paths.output]);
 }
 
-function javascript() {
+function lint() {
   return src([
-    'src/*.js',
+    `${paths.source}`,
     'gulpfile.babel.js',
   ])
     .pipe(eslint())
@@ -27,7 +33,7 @@ function javascript() {
 function liveReload(done) {
   browserSync.init({
     server: {
-      baseDir: './',
+      baseDir: paths.base,
     },
     port: 3000,
   });
@@ -40,22 +46,30 @@ function browserSyncReload(done) {
   done();
 }
 
-function transpile() {
-  return src('src/*.js')
-    .pipe(concat(`../${outputDir}/game.min.js`))
-    .pipe(babel())
-    .pipe(terser())
-    .pipe(dest(outputDir))
-    .pipe(browserSync.stream());
+function compile() {
+  return browserify({
+    entries: [`${paths.source}/index.js`],
+    debug: true,
+    transform: [
+      babelify.configure({
+        presets: ['@babel/preset-env'],
+      }),
+    ],
+  })
+    .bundle()
+    .pipe(source('game.min.js'))
+    .pipe(buffer())
+    .pipe(uglify())
+    .pipe(dest(paths.output));
 }
 
 function watchFiles() {
-  watch('src/*.js', transpile);
-  watch('dist/main.js', browserSyncReload);
+  watch(`${paths.source}/*.js`, compile);
+  watch(`${paths.output}/game.min.js`, browserSyncReload);
 }
 
-exports.lint = series(javascript);
+exports.lint = series(lint);
 exports.clean = series(clean);
-exports.build = series(exports.clean, exports.lint, transpile);
+exports.build = series(exports.clean, exports.lint, compile);
 exports.watch = series(exports.build, liveReload, watchFiles);
 exports.default = exports.watch;

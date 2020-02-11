@@ -1,4 +1,4 @@
-class TitleScene extends Phaser.Scene {
+export default class TitleScene extends Phaser.Scene {
   constructor(name, config) {
     super(name);
     this.config = config;
@@ -84,5 +84,3 @@ class TitleScene extends Phaser.Scene {
     return false;
   }
 }
-
-export default TitleScene;

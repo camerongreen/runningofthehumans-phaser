@@ -1,4 +1,4 @@
-class GameScene extends Phaser.Scene {
+export default class GameScene extends Phaser.Scene {
   constructor(name, config) {
     super(name);
     this.config = config;
@@ -369,5 +369,3 @@ class GameScene extends Phaser.Scene {
     }, this);
   }
 }
-
-export default GameScene;
