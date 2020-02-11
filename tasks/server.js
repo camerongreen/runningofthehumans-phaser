@@ -11,7 +11,7 @@ const bundler = webpack(webpackConfig)
 export function server() {
 
     let config = {
-        server: 'dist',
+        server: './',
         open: false,
         middleware: [
             webpackDevMiddleware(bundler, { /* options */ })
@@ -21,4 +21,5 @@ export function server() {
     browser.init(config)
 
     gulp.watch('dist/js/*.js').on('change', () => browser.reload())
+    gulp.watch('index.html').on('change', () => browser.reload())
 }
