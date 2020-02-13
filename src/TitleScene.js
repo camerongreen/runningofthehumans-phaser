@@ -15,8 +15,8 @@ export default class TitleScene extends Phaser.Scene {
    * Preload assets before scene begins.
    */
   preload() {
-    this.load.image('bg', 'assets/img/bg.png');
-    this.load.image('bull', 'assets/img/bull.png');
+    this.load.image('bg', `${this.config.assets}/img/bg.png`);
+    this.load.image('bull', `${this.config.assets}/img/bull.png`);
   }
 
   /**

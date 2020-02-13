@@ -43,26 +43,26 @@ export default class GameScene extends Phaser.Scene {
    * Preload assets before game begins.
    */
   preload() {
-    this.load.image('bg', 'assets/img/bg.png');
-    this.load.image('bull', 'assets/img/bull.png');
-    this.load.image('best_time', 'assets/img/best_time.png');
-    this.load.image('red', 'assets/img/red.png');
+    this.load.image('bg', `${this.config.assets}/img/bg.png`);
+    this.load.image('bull', `${this.config.assets}/img/bull.png`);
+    this.load.image('best_time', `${this.config.assets}/img/best_time.png`);
+    this.load.image('red', `${this.config.assets}/img/red.png`);
 
-    this.load.spritesheet('runner', 'assets/img/runner.png', {
+    this.load.spritesheet('runner', `${this.config.assets}/img/runner.png`, {
       frameWidth: 40,
       frameHeight: 40,
     });
     this.load.audio('missed', [
-      'assets/audio/missed.ogg',
-      'assets/audio/missed.mp3',
+      `${this.config.assets}/audio/missed.ogg`,
+      `${this.config.assets}/audio/missed.mp3`,
     ]);
     this.load.audio('music', [
-      'assets/audio/espana.ogg',
-      'assets/audio/espana.mp3',
+      `${this.config.assets}/audio/espana.ogg`,
+      `${this.config.assets}/audio/espana.mp3`,
     ]);
     this.load.audio('ole', [
-      'assets/audio/ole.ogg',
-      'assets/audio/ole.mp3',
+      `${this.config.assets}/audio/ole.ogg`,
+      `${this.config.assets}/audio/ole.mp3`,
     ]);
   }
 
