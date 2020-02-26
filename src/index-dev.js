@@ -1,8 +1,8 @@
-import 'phaser';
+import '../node_modules/phaser/dist/phaser.min.js';
 
-import TitleScene from './TitleScene';
-import GameScene from './GameScene';
-import Env from './Env';
+import TitleScene from './TitleScene.js';
+import GameScene from './GameScene.js';
+import Env from './Env.js';
 
 const env = new Env();
 

@@ -65,7 +65,7 @@ function compile() {
 
 function watchFiles() {
   watch(`${paths.source}/*.js`, compile);
-  watch(`${paths.output}/game.min.js`, browserSyncReload);
+  watch(`${paths.output}/*.js`, browserSyncReload);
 }
 
 exports.lint = series(lint);

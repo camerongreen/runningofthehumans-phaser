@@ -74,19 +74,19 @@ export default class GameScene extends Phaser.Scene {
     this.music = this.sound.add('music');
     this.ole = this.sound.add('ole', { volume: 0.1 });
 
-    this.background = this.add.tileSprite(this.config.width / 2,
-      this.config.height / 2, this.config.width, this.config.height, 'bg');
+    this.background = this.add.tileSprite(this.config.scale.width / 2,
+      this.config.scale.height / 2, this.config.scale.width, this.config.scale.height, 'bg');
 
-    const speedBg = this.add.rectangle(this.config.width - 40,
-      this.config.height - 100, 20, 100, 0xffffff);
+    const speedBg = this.add.rectangle(this.config.scale.width - 40,
+      this.config.scale.height - 100, 20, 100, 0xffffff);
     speedBg.setStrokeStyle(2, 0xffffff);
 
     const graphics = this.add.graphics();
     graphics.fillGradientStyle(0xff0000, 0xff0000, 0xffff00, 0xffff00, 1);
-    graphics.fillRect(this.config.width - 50, this.config.height - 150, 20, 100);
+    graphics.fillRect(this.config.scale.width - 50, this.config.scale.height - 150, 20, 100);
 
-    this.speedIndicator = this.add.rectangle(this.config.width - 40,
-      this.config.height - 100, 20, 100, 0xffffff);
+    this.speedIndicator = this.add.rectangle(this.config.scale.width - 40,
+      this.config.scale.height - 100, 20, 100, 0xffffff);
     this.speedIndicator.setStrokeStyle(2, 0xffffff);
 
     this.scoreText = this.add.text(16, 16, '', {
@@ -94,12 +94,12 @@ export default class GameScene extends Phaser.Scene {
       fill: '#000',
     });
 
-    this.timerText = this.add.text(this.config.width - 210, 16, '', {
+    this.timerText = this.add.text(this.config.scale.width - 210, 16, '', {
       fontSize: '32px',
       fill: '#000',
     });
 
-    this.resultsText = this.add.text(this.config.width / 2, this.config.height / 2, '', {
+    this.resultsText = this.add.text(this.config.scale.width / 2, this.config.scale.height / 2, '', {
       font: 'bold 28px Arial',
       fill: '#fff',
       align: 'center',
@@ -108,9 +108,9 @@ export default class GameScene extends Phaser.Scene {
     this.resultsText.setShadow(3, 4, 'rgba(0,0,0,0.5', 5);
 
     this.physics.world.setBounds(this.bounds, 0,
-      this.config.width - (2 * this.bounds), this.config.height);
+      this.config.scale.width - (2 * this.bounds), this.config.scale.height);
 
-    this.bull = this.physics.add.sprite(this.config.width / 2, this.config.height - 78, 'bull');
+    this.bull = this.physics.add.sprite(this.config.scale.width / 2, this.config.scale.height - 78, 'bull');
     this.bull.setCollideWorldBounds(true);
     this.bull.body.onWorldBounds = true;
     this.physics.world.on('worldbounds', () => {
@@ -145,6 +145,13 @@ export default class GameScene extends Phaser.Scene {
       this.gotRunner(runner);
     }, null, this);
 
+    this.setupKeyboardInteractions();
+  }
+
+  /**
+   * Interact with the users keyboard.
+   */
+  setupKeyboardInteractions() {
     this.cursors = this.input.keyboard.createCursorKeys();
 
     const space = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
@@ -173,6 +180,25 @@ export default class GameScene extends Phaser.Scene {
           break;
       }
     });
+
+    const sound = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
+    sound.on('up', () => {
+      if (this.music.isPlaying) {
+        this.music.pause();
+      } else if (this.music.isPaused) {
+        this.music.resume();
+      }
+    });
+
+    const fullScreen = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.F);
+
+    fullScreen.on('down', function () {
+      if (this.scale.isFullscreen) {
+        this.scale.stopFullscreen();
+      } else {
+        this.scale.startFullscreen();
+      }
+    }, this);
   }
 
   pause() {
@@ -228,7 +254,7 @@ export default class GameScene extends Phaser.Scene {
       // Show a bit of dissappearing text to the user
       // and play a sound.
       this.missed.play();
-      const missedText = this.add.text(rnr.x, this.config.height - 25, `${this.missedPenalty} secs`, {
+      const missedText = this.add.text(rnr.x, this.config.scale.height - 25, `${this.missedPenalty} secs`, {
         fontSize: '22px',
         fill: '#F00',
       }).setOrigin(0.5);
@@ -300,7 +326,7 @@ export default class GameScene extends Phaser.Scene {
       Phaser.Actions.Call(this.runnerGroup.getChildren(), (runner) => {
         const rnr = runner;
         rnr.y += this.speed - rnr.speed;
-        if (rnr.y > this.config.height + 10) {
+        if (rnr.y > this.config.scale.height + 10) {
           this.missedRunner(runner);
         }
       }, this);
@@ -383,7 +409,7 @@ export default class GameScene extends Phaser.Scene {
     this.missedScore = 0;
     this.speed = 0;
     this.bullPositionX = 0;
-    this.bull.x = this.config.width / 2;
+    this.bull.x = this.config.scale.width / 2;
     this.lastTime = Date.now();
     this.timer = 0;
     this.updateScore();
@@ -405,8 +431,8 @@ export default class GameScene extends Phaser.Scene {
     let first = true;
 
     Phaser.Actions.Call(this.runnerGroup.getChildren(), (runner) => {
-      const runnerX = Phaser.Math.Between(this.bounds, this.config.width - (2 * this.bounds));
-      const runnerY = Phaser.Math.Between(this.config.height - 200, this.config.height - 250);
+      const runnerX = Phaser.Math.Between(this.bounds, this.config.scale.width - (2 * this.bounds));
+      const runnerY = Phaser.Math.Between(this.config.scale.height - 200, this.config.scale.height - 250);
 
       const rnr = runner;
       rnr.setPosition(runnerX, runnerY);
