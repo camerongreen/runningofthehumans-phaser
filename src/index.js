@@ -2,9 +2,6 @@ import 'phaser';
 
 import TitleScene from './TitleScene';
 import GameScene from './GameScene';
-import Env from './Env';
-
-const env = new Env();
 
 const config = {
   type: Phaser.AUTO,
@@ -22,7 +19,7 @@ const config = {
       debug: false,
     },
   },
-  assets: env.isDrupal() ? drupalSettings.running.assets : './assets',
+  assets: './assets',
 };
 
 const SCENE_TITLE = 'TitleScene';

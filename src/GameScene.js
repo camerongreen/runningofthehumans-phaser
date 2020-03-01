@@ -110,7 +110,7 @@ export default class GameScene extends Phaser.Scene {
     this.physics.world.setBounds(this.bounds, 0,
       this.config.scale.width - (2 * this.bounds), this.config.scale.height);
 
-    this.bull = this.physics.add.sprite(this.config.scale.width / 2, this.config.scale.height - 78, 'bull');
+    this.bull = this.physics.add.sprite(this.config.scale.width / 2, this.config.scale.height - 75, 'bull');
     this.bull.setCollideWorldBounds(true);
     this.bull.body.onWorldBounds = true;
     this.physics.world.on('worldbounds', () => {

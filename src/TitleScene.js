@@ -24,7 +24,7 @@ export default class TitleScene extends Phaser.Scene {
    */
   create() {
     this.add.tileSprite(this.config.scale.width / 2, this.config.scale.height / 2, this.config.scale.width, this.config.scale.height, 'bg');
-    this.physics.add.sprite(this.config.scale.width / 2, this.config.scale.height - 78, 'bull');
+    this.physics.add.sprite(this.config.scale.width / 2, this.config.scale.height - 75, 'bull');
 
     const title = this.add.text(this.config.scale.width / 2, this.config.scale.height / 4, 'Running of the humans', {
       font: 'bold 50px Verdana',
@@ -78,7 +78,6 @@ export default class TitleScene extends Phaser.Scene {
       if (this.scale.isFullscreen) {
         this.scale.stopFullscreen();
       } else {
-
         this.scale.startFullscreen();
       }
     }, this);
