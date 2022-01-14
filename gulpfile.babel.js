@@ -1,3 +1,6 @@
+/**
+ * Gulpfile in version 4 format.
+ */
 const {
   dest, series, src, watch,
 } = require('gulp');
@@ -16,20 +19,38 @@ const paths = {
   base: './',
 };
 
+/**
+ * Clean all the output paths.
+ *
+ * @return {boolean}
+ *   Success.
+ */
 function clean() {
   return del([paths.output]);
 }
 
+/**
+ * Check for proper syntax.
+ *
+ * @return {boolean}
+ *   Success.
+ */
 function lint() {
   return src([
     `${paths.source}`,
     'gulpfile.babel.js',
   ])
-    .pipe(eslint())
-    .pipe(eslint.format())
-    .pipe(eslint.failAfterError());
+      .pipe(eslint())
+      .pipe(eslint.format())
+      .pipe(eslint.failAfterError());
 }
 
+/**
+ * Do the live reload thing.
+ *
+ * @param {function} done
+ *   Function to call once reload finished.
+ */
 function liveReload(done) {
   browserSync.init({
     server: {
@@ -40,12 +61,23 @@ function liveReload(done) {
   done();
 }
 
-// BrowserSync Reload
+/**
+ * BrowserSync Reload
+ *
+ * @param {function} done
+ *   Function to call once reload finished.
+ */
 function browserSyncReload(done) {
   browserSync.reload();
   done();
 }
 
+/**
+ * Compile everything.
+ *
+ * @return {function}
+ *   Return everything.
+ */
 function compile() {
   return browserify({
     entries: [`${paths.source}/index.js`],
@@ -56,13 +88,16 @@ function compile() {
       }),
     ],
   })
-    .bundle()
-    .pipe(source('game.min.js'))
-    .pipe(buffer())
-    .pipe(uglify())
-    .pipe(dest(paths.output));
+      .bundle()
+      .pipe(source('game.min.js'))
+      .pipe(buffer())
+      .pipe(uglify())
+      .pipe(dest(paths.output));
 }
 
+/**
+ * Watch files while you code.
+ */
 function watchFiles() {
   watch(`${paths.source}/*.js`, compile);
   watch(`${paths.output}/*.js`, browserSyncReload);
