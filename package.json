@@ -10,11 +10,11 @@
     "phaser": "^3.54.0"
   },
   "devDependencies": {
+    "@babel/cli": "*",
     "@babel/core": "*",
+    "@babel/eslint-parser": "*",
     "@babel/preset-env": "*",
     "@babel/register": "*",
-    "@babel/cli": "*",
-    "@babel/eslint-parser": "*",
     "babel-loader": "*",
     "babelify": "*",
     "browser-sync": "*",
@@ -32,6 +32,7 @@
     "gulp-eslint": "*",
     "gulp-plumber": "*",
     "gulp-uglify": "*",
+    "husky": "^9.1.7",
     "install-peerdeps": "*",
     "source": "*",
     "vinyl-buffer": "*",
@@ -53,5 +54,8 @@
         }
       ]
     ]
+  },
+  "scripts": {
+    "prepare": "husky"
   }
 }
