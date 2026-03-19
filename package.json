@@ -1,5 +1,5 @@
 {
-  "name": "test-phaser",
+  "name": "earth-phaser",
   "version": "1.0.0",
   "description": "",
   "main": "dist/game.js",
@@ -32,7 +32,7 @@
     "gulp-eslint": "*",
     "gulp-plumber": "*",
     "gulp-uglify": "*",
-    "husky": "^9.1.7",
+    "husky": "*",
     "install-peerdeps": "*",
     "source": "*",
     "vinyl-buffer": "*",
