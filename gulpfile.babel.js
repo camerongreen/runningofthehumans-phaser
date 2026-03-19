@@ -5,7 +5,7 @@ const {
   dest, series, src, watch,
 } = require('gulp');
 const browserSync = require('browser-sync').create();
-const del = require('del');
+const {deleteAsync} = require('del');
 const eslint = require('gulp-eslint');
 const browserify = require('browserify');
 const babelify = require('babelify');
@@ -26,7 +26,7 @@ const paths = {
  *   Success.
  */
 function clean() {
-  return del([paths.output]);
+  return deleteAsync([paths.output]);
 }
 
 /**
